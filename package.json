@@ -1,0 +1,39 @@
+{
+  "name": "tweet-bot",
+  "dependencies": {
+    "express": "~3.4.6",
+    "consolidate": "~0.10.0",
+    "mongoose": "~3.8.1",
+    "passport": "~0.1.17",
+    "passport-twitter": "~1.0.2",
+    "ntwitter": "~0.5.0",
+    "chance": "~0.5.3",
+    "handlebars": "~1.1.2"
+  },
+  "subdomain": "tweet-bot",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "0.10.x"
+  },
+  "description": "Tweet Bot",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pulkitsethi/tweet-bot.git"
+  },
+  "keywords": [
+    "tweet",
+    "bot"
+  ],
+  "author": "Pulkit Sethi",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/pulkitsethi/tweet-bot/issues"
+  },
+  "homepage": "https://github.com/pulkitsethi/tweet-bot"
+}

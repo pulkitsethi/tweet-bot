@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">-->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+
+    <link rel="stylesheet" href="/stylesheets/bootstrap-social.css" media="screen">
+    
+    
+    
+    <link href="/stylesheets/style.css" rel="stylesheet" media="screen">
+
+</head>
+
+<body>
+    <div id="wrapper" class="container">
+
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">
+                    <img src="/images/eve-icon-32.png">
+                    {{title}}
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+
+            </div>
+        </nav>
+
+
+
+        <div class="jumbotron">
+            {{#unless user}}
+            <h1>Welcome to Tweet Bot</h1>
+            
+            <p>
+                Please sign into Twitter by clicking the button below.  It will take you to a login screen and
+                ask for your premission to tweet on your behalf.
+            </p>
+            
+            <p>
+                <a class="btn btn-social btn-lg btn-twitter" role="button" href="/auth/twitter">
+                    <i class="fa fa-twitter"></i>Sign in with Twitter
+                </a>
+            </p>
+            
+            {{else}} 
+            <h1>Signed in as <span class="red">{{user.name}}</span></h1>  
+            
+            <p>
+                Congrats! You are now signed in. The button below will allow you to send a tweet with the ease of 1-click.
+            </p>
+            
+            <p></p>
+            
+            <p>
+                <button id="single-tweet" type="button" class="btn btn-lg btn-primary">Send Tweet</button>
+            </p>
+            
+            {{/unless}}
+        </div>
+    </div>
+    
+
+
+    <!--Javascript-->
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    
+    <script type="text/javascript" src="/javascripts/noty/jquery.noty.js"></script>
+    <script type="text/javascript" src="/javascripts/noty/layouts/top.js"></script>
+    <script type="text/javascript" src="/javascripts/noty/themes/default.js"></script>
+   
+    <script>
+        		/* Generates Notifcation
+		*	type: error, information, success, etc
+		*	layout: top, topCenter, topRight, topLeft, etc
+		*	text: Text to display
+		*	timeout: Time that passes before notification goes away (in milliseconds)
+		*/
+		var generateNotification = function(type, layout, text, timeout) {
+
+			   var n = noty({
+			   		text: text,
+			   		type: type,
+			        dismissQueue: true,
+			   		layout: layout,
+			   		theme: 'defaultTheme',
+			   		timeout: timeout
+			   });
+
+			   return n;
+		};
+        
+        $('#single-tweet').click(function() {
+            var ajaxNotification;
+            
+            //Sending tweet
+			$.ajax({
+				type: "POST",
+				url: "/send/tweet",
+				beforeSend: function(){
+					ajaxNotification = generateNotification('information', 'top', 'Sending Tweet...', '3000');
+				},
+				success: function(data){
+					ajaxNotification.close();
+
+					ajaxNotification = generateNotification('success', 'top', 'Tweet sent sucessfully', '3000');
+				},
+				complete: function (){
+					ajaxNotification.close();
+				},
+				error: function (){
+                    ajaxNotification.close();
+					generateNotification('error', 'top', 'Tweet was unsuccesful :( Please try again shortly.', '3000');
+				}
+			});
+        });
+    </script>
+</body>
+
+</html>
