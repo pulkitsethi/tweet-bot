@@ -18,25 +18,36 @@
     
     <link href="/stylesheets/style.css" rel="stylesheet" media="screen">
 
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('set', 'appName', 'Tweet Bot');
+      ga('create', 'UA-46327435-1', 'jit.su');
+      ga('send', 'pageview');
+    
+    </script>
 </head>
 
 <body>
     <div id="wrapper" class="container">
 
         <nav class="navbar navbar-default" role="navigation">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">
+            <div>
+                <a class="navbar-brand pull-left" href="/">
                     <img src="/images/eve-icon-32.png">
                     {{title}}
                 </a>
             </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
-
+            
+            {{#if user}}
+            <div id="navbar-logout" class="nav pull-right">
+              <a href="/logout" class="btn btn-default btn-lg navbar-btn navbar-right" role="button" onClick="ga('send', 'event', 'button', 'click', 'log out');">Logout</a>
             </div>
+            {{/if}}
         </nav>
-
-
 
         <div class="jumbotron">
             {{#unless user}}
@@ -48,7 +59,7 @@
             </p>
             
             <p>
-                <a class="btn btn-social btn-lg btn-twitter" role="button" href="/auth/twitter">
+                <a class="btn btn-social btn-lg btn-twitter" role="button" href="/auth/twitter" onClick="ga('send', 'event', 'button', 'click', 'sign in');">
                     <i class="fa fa-twitter"></i>Sign in with Twitter
                 </a>
             </p>
@@ -78,6 +89,7 @@
     
     <script type="text/javascript" src="/javascripts/noty/jquery.noty.js"></script>
     <script type="text/javascript" src="/javascripts/noty/layouts/top.js"></script>
+    <script type="text/javascript" src="/javascripts/noty/layouts/topCenter.js"></script>
     <script type="text/javascript" src="/javascripts/noty/themes/default.js"></script>
    
     <script>
@@ -102,6 +114,10 @@
 		};
         
         $('#single-tweet').click(function() {
+            event.preventDefault();
+            
+            ga('send', 'event', 'tweet', 'click', '{{user.name}}');
+            
             var ajaxNotification;
             
             //Sending tweet
@@ -109,23 +125,29 @@
 				type: "POST",
 				url: "/send/tweet",
 				beforeSend: function(){
-					ajaxNotification = generateNotification('information', 'top', 'Sending Tweet...', '3000');
+					ajaxNotification = generateNotification('information', 'topCenter', 'Sending Tweet...', '1500');
 				},
 				success: function(data){
 					ajaxNotification.close();
 
-					ajaxNotification = generateNotification('success', 'top', 'Tweet sent sucessfully', '3000');
-				},
+					ajaxNotification = generateNotification('success', 'topCenter', 'Tweet sent sucessfully', '1500');
+				    
+                    ga('send', 'event', 'tweet', 'success', '{{user.name}}');
+                },
 				complete: function (){
 					ajaxNotification.close();
 				},
 				error: function (){
                     ajaxNotification.close();
-					generateNotification('error', 'top', 'Tweet was unsuccesful :( Please try again shortly.', '3000');
-				}
+					generateNotification('error', 'topCenter', 'Tweet was unsuccesful :( Please try again shortly.', '1500');
+				
+                    ga('send', 'event', 'tweet', 'fail', '{{user.name}}');
+                }
 			});
         });
     </script>
+    
+
 </body>
 
 </html>

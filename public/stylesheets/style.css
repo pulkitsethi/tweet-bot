@@ -9,3 +9,7 @@ body {
 h1 span.red {
     color: #31708F;
 }
+
+#navbar-logout {
+    margin-right: 10px;
+}

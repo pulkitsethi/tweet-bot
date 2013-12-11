@@ -16,6 +16,7 @@ var express = require('express'),
 // Instantiate Chance so it can be used
 var chance = new Chance();
 
+
 //Login Twitter Configuration
 var TWITTER_CONSUMER_KEY = "MiqrbvfTyLkcVj51EHW5w";
 var TWITTER_CONSUMER_SECRET = "Xqy8Wr3bcFdMZRc7R9bHX2rxrW8PanexoZbNzbESwc";
@@ -39,10 +40,11 @@ mongoose.model('User', UserSchema);
 
 var User = mongoose.model('User');
 
+
 passport.use(new TwitterStrategy({
         consumerKey: TWITTER_CONSUMER_KEY,
         consumerSecret: TWITTER_CONSUMER_SECRET,
-        callbackURL: "http://localhost:3000/auth/twitter/callback"
+        callbackURL: "/auth/twitter/callback"
     },
     function (token, tokenSecret, profile, done) {
         User.findOne({
@@ -73,6 +75,7 @@ passport.use(new TwitterStrategy({
         })
     }
 ));
+
 
 passport.serializeUser(function (user, done) {
     done(null, user.uid);
@@ -141,11 +144,13 @@ app.get('/', function (req, res) {
     });
 });
 
+
 //Logout
 app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
 });
+
 
 // Redirect the user to Twitter for authentication.  When complete, Twitter
 // will redirect the user back to the application at /auth/twitter/callback
@@ -161,9 +166,10 @@ app.get('/auth/twitter/callback',
         failureRedirect: '/login'
     }));
 
+
 var twitArray = {};
 
-var tweet = "I #VoteSTRIVE for the @FedEx #CountlessPossibilities $25,000 grant. Vote and see their story here: http://at.fedex.com/qwi6o "
+var tweet = "I #VoteSTRIVE for the @FedEx #CountlessPossibilities $25,000 grant. Vote and see their story here: http://at.fedex.com/qwi6o ";
 
 //API
 app.post('/send/tweet', function (req, res) {
@@ -177,20 +183,14 @@ app.post('/send/tweet', function (req, res) {
     //Sending tweet
     var tweet = randomizeTweet();
 
-    twit
-        .verifyCredentials(function (err, data) {
-            if(err){
-                res.redirect('/login');
-            }
-        })
-        .updateStatus(tweet,
+    twit.updateStatus(tweet,
             function (err, data) {
                 if (err) {
                     res.send(500, err);
                 } else {
                     res.send(200);
                 }
-                //console.log(data);
+               // console.log(data);
             }
     );
 
@@ -230,6 +230,35 @@ function randomizeTweet(){
     return randomizedTweet;
 }
 
+//API
+app.get('/search/tweet', function (req, res) {
+    var uid = req.user.uid;
+    var key = req.user.accessTokenKey;
+    var secret = req.user.accessTokenSecret;
+
+    //Creating twit object
+    var twit = createTwit(uid, key, secret);
+
+    twit.search('@pulkitsethi AND #VoteSTRIVE', {},
+            function (err, data) {
+                if (err) {
+                    res.send(500, err);
+                } else {
+                    res.render('search', {
+                        title: 'Tweet Bot',
+                        user: req.user,
+                        data: data
+                    });
+                }
+               // console.log(data);
+            }
+    );
+
+});
+
+
+
+
 var server = http.createServer(app);
 
 //Start server
@@ -237,9 +266,11 @@ server.listen(app.get('port'), function () {
     console.log("Express server listening on %s:%d in %s mode", '127.0.0.1', app.get('port'), app.settings.env);
 });
 
+
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/')
+    res.redirect('/');
+    console.log('redirecting to homepage');
 }

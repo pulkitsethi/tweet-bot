@@ -14,26 +14,13 @@
   "scripts": {
     "start": "node app.js"
   },
-  "version": "0.0.1",
+  "version": "0.0.1-16",
   "private": true,
   "engines": {
     "node": "0.10.x"
   },
   "description": "Tweet Bot",
   "main": "app.js",
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/pulkitsethi/tweet-bot.git"
-  },
-  "keywords": [
-    "tweet",
-    "bot"
-  ],
   "author": "Pulkit Sethi",
-  "license": "BSD-2-Clause",
-  "bugs": {
-    "url": "https://github.com/pulkitsethi/tweet-bot/issues"
-  },
-  "homepage": "https://github.com/pulkitsethi/tweet-bot"
+  "homepage": "http://tweet-bot.jit.su"
 }
