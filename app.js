@@ -232,8 +232,10 @@ app.get('/search/tweet', function (req, res) {
 
     //Creating twit object
     var twit = createTwit(uid, key, secret);
+    
+    var hashtag = '#hastag'
 
-    twit.search('@' + req.user.id + ' AND #VoteSTRIVE', {},
+    twit.search('@' + req.user.id + ' AND ' + hashtag, {},
             function (err, data) {
                 if (err) {
                     res.send(500, err);
