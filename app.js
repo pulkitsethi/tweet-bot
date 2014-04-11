@@ -11,15 +11,12 @@ var express = require('express'),
     passport = passport = require('passport'),
     TwitterStrategy = require('passport-twitter').Strategy,
     twitter = require('ntwitter'),
-    Chance = require('chance');
+    Chance = require('chance'),
+    config = require("./config/oauth.js"),
+    services = require("./config/services.js");
 
 // Instantiate Chance so it can be used
 var chance = new Chance();
-
-
-//Login Twitter Configuration
-var TWITTER_CONSUMER_KEY = "MiqrbvfTyLkcVj51EHW5w";
-var TWITTER_CONSUMER_SECRET = "Xqy8Wr3bcFdMZRc7R9bHX2rxrW8PanexoZbNzbESwc";
 
 //Create User Schema
 var UserSchema = new Schema({
@@ -42,9 +39,9 @@ var User = mongoose.model('User');
 
 
 passport.use(new TwitterStrategy({
-        consumerKey: TWITTER_CONSUMER_KEY,
-        consumerSecret: TWITTER_CONSUMER_SECRET,
-        callbackURL: "/auth/twitter/callback"
+        consumerKey: config.twitter.clientID,
+        consumerSecret: config.twitter.clientSecret,
+        callbackURL: config.twitter.callbackURL
     },
     function (token, tokenSecret, profile, done) {
         User.findOne({
@@ -118,20 +115,17 @@ app.configure(function () {
 });
 
 app.configure('development', function(){
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-
-  // Connect mongoose
-  //mongoose.connect('mongodb://localhost/whereispulkit');
-  mongoose.connect('mongodb://localhost/tweet-bot');
-  //mongoose.connect('mongodb://nodejitsu:bb76e643bb93517a1ec1a299d3d4e771@alex.mongohq.com:10033/nodejitsudb642845281');
+    // Connect mongoose
+    mongoose.connect(services.mongodb.dev);
 });
 
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
-
-  // Connect mongoose
-  mongoose.connect('mongodb://nodejitsu:54c338a2c112c21f355b496576eed2b5@linus.mongohq.com:10099/nodejitsudb5960685806');
+    app.use(express.errorHandler()); 
+    
+    // Connect mongoose
+    mongoose.connect(services.mongodb.prod);
 });
 
 /////ROUTES
@@ -169,7 +163,7 @@ app.get('/auth/twitter/callback',
 
 var twitArray = {};
 
-var tweet = "I #VoteSTRIVE for the @FedEx #CountlessPossibilities $25,000 grant. Vote and see their story here: http://at.fedex.com/qwi6o ";
+var tweet = "MESSAGE HERE ";
 
 //API
 app.post('/send/tweet', function (req, res) {
@@ -204,8 +198,8 @@ function createTwit(uid, key, secret){
         console.log('User already in array - ID: ' + uid);
     } else {
         twit = new twitter({
-            consumer_key: TWITTER_CONSUMER_KEY,
-            consumer_secret: TWITTER_CONSUMER_SECRET,
+            consumer_key: config.twitter.clientID,
+            consumer_secret: config.twitter.clientSecret,
             access_token_key: key,
             access_token_secret: secret
         });
@@ -239,7 +233,7 @@ app.get('/search/tweet', function (req, res) {
     //Creating twit object
     var twit = createTwit(uid, key, secret);
 
-    twit.search('@pulkitsethi AND #VoteSTRIVE', {},
+    twit.search('@' + req.user.id + ' AND #VoteSTRIVE', {},
             function (err, data) {
                 if (err) {
                     res.send(500, err);
